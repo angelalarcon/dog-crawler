@@ -1,0 +1,14 @@
+{
+  "name": "dog-crawler",
+  "version": "1.0.0",
+  "description": "Crawler de perros en adopción de Madrid",
+  "type": "module",
+  "main": "crawler.js",
+  "scripts": {
+    "start": "node server.js",
+    "crawl": "node crawler.js"
+  },
+  "dependencies": {
+    "puppeteer": "^22.15.0"
+  }
+}
