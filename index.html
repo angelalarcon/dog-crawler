@@ -3,51 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🐾 Buscador de Perros en Adopción — Madrid</title>
+  <title>🐾 Perros en Adopción — Madrid</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @keyframes fade-up {
-      from { opacity: 0; transform: translateY(16px); }
+      from { opacity: 0; transform: translateY(14px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    .dog-card { animation: fade-up 0.35s ease both; }
-
-    @keyframes shimmer {
-      0%   { background-position: -400px 0; }
-      100% { background-position: 400px 0; }
-    }
-    .shimmer {
-      background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
-      background-size: 400px 100%;
-      animation: shimmer 1.4s infinite;
-    }
+    .dog-card { animation: fade-up 0.3s ease both; }
 
     @keyframes progress-stripe {
-      0%   { background-position: 0 0; }
-      100% { background-position: 40px 0; }
+      to { background-position: 40px 0; }
     }
     .progress-bar {
       background-image: repeating-linear-gradient(
-        45deg,
-        rgba(255,255,255,.15) 0,
-        rgba(255,255,255,.15) 10px,
-        transparent 10px,
-        transparent 20px
+        45deg, rgba(255,255,255,.18) 0, rgba(255,255,255,.18) 10px,
+        transparent 10px, transparent 20px
       );
-      animation: progress-stripe 0.6s linear infinite;
+      animation: progress-stripe 0.55s linear infinite;
     }
-
     .line-clamp-3 {
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      display: -webkit-box; -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical; overflow: hidden;
     }
   </style>
 </head>
-<body class="bg-stone-50 min-h-screen font-sans text-gray-800">
+<body class="bg-stone-50 min-h-screen">
 
-  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <!-- ── Header ────────────────────────────────────────────────────────────── -->
   <header class="bg-white border-b border-stone-200">
     <div class="max-w-5xl mx-auto px-4 py-5 flex items-center gap-3">
       <span class="text-3xl select-none">🐾</span>
@@ -58,252 +41,414 @@
     </div>
   </header>
 
-  <!-- ── Search ─────────────────────────────────────────────────────────── -->
+  <!-- ── Search ─────────────────────────────────────────────────────────────── -->
   <section class="bg-amber-500 py-10 px-4">
     <div class="max-w-2xl mx-auto">
-      <p class="text-amber-100 text-sm font-medium mb-2 tracking-wide uppercase">URL del refugio</p>
+      <p class="text-amber-100 text-xs font-semibold mb-2 tracking-widest uppercase">URL del refugio</p>
       <div class="flex gap-2">
-        <input
-          id="urlInput"
-          type="url"
+        <input id="urlInput" type="url"
           placeholder="https://petshelter.miwuki.com/perros-en-adopcion-en-madrid"
-          class="flex-1 rounded-xl px-4 py-3 text-sm bg-white shadow-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-white/60 placeholder:text-gray-400"
           value="https://petshelter.miwuki.com/perros-en-adopcion-en-madrid"
+          class="flex-1 rounded-xl px-4 py-3 text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-white/60 placeholder:text-gray-400"
         />
-        <button
-          id="searchBtn"
-          onclick="startCrawl()"
-          class="shrink-0 bg-gray-900 hover:bg-gray-700 active:scale-95 text-white font-semibold px-5 py-3 rounded-xl transition-all duration-150 text-sm flex items-center gap-2"
-        >
+        <button id="searchBtn" onclick="startSearch()"
+          class="shrink-0 bg-gray-900 hover:bg-gray-700 active:scale-95 text-white font-semibold px-5 py-3 rounded-xl transition-all text-sm flex items-center gap-2">
           <span id="btnIcon">🔍</span>
           <span id="btnText">Buscar</span>
         </button>
       </div>
-      <p class="text-amber-100/70 text-xs mt-2">Funciona con miwuki.com. Puede tardar 1–3 min con todos los perfiles.</p>
+      <p id="modeTag" class="text-amber-100/60 text-xs mt-2"></p>
     </div>
   </section>
 
-  <!-- ── Progress ───────────────────────────────────────────────────────── -->
+  <!-- ── Progress ───────────────────────────────────────────────────────────── -->
   <div id="progressSection" class="hidden max-w-2xl mx-auto mt-8 px-4">
     <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-5">
-
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
-          <div id="phaseIcon" class="text-lg">⏳</div>
+          <span id="phaseIcon" class="text-lg">⏳</span>
           <p id="phaseLabel" class="text-sm font-semibold text-gray-700">Cargando listado...</p>
         </div>
         <span id="progressCount" class="text-xs text-gray-400 tabular-nums"></span>
       </div>
-
-      <!-- Bar -->
       <div class="h-3 bg-stone-100 rounded-full overflow-hidden">
-        <div
-          id="progressFill"
-          class="h-full bg-amber-400 rounded-full transition-all duration-300 progress-bar"
-          style="width: 0%"
-        ></div>
+        <div id="progressFill"
+          class="h-full bg-amber-400 rounded-full transition-[width] duration-300 ease-out progress-bar"
+          style="width:0%"></div>
       </div>
-
-      <p id="currentDog" class="text-xs text-gray-400 mt-2 truncate"></p>
+      <p id="currentDog" class="text-xs text-gray-400 mt-2 h-4 truncate"></p>
     </div>
   </div>
 
-  <!-- ── Results ─────────────────────────────────────────────────────────── -->
+  <!-- ── Error ──────────────────────────────────────────────────────────────── -->
+  <div id="errorBox" class="hidden max-w-2xl mx-auto mt-4 px-4">
+    <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 space-y-1">
+      <p><span class="font-semibold">Error:</span> <span id="errorMsg"></span></p>
+      <p id="errorHint" class="text-xs text-red-500"></p>
+    </div>
+  </div>
+
+  <!-- ── Results ────────────────────────────────────────────────────────────── -->
   <main class="max-w-7xl mx-auto px-4 py-8">
     <div id="resultsHeader" class="hidden flex items-center gap-2 mb-5">
-      <h2 class="text-base font-semibold text-gray-700">Perros encontrados</h2>
+      <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Perros encontrados</h2>
       <span id="totalBadge" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
     </div>
-
     <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
-
-    <div id="emptyState" class="hidden text-center py-20 text-gray-400">
-      <div class="text-5xl mb-3">🐕</div>
-      <p class="text-base">No se encontraron perros. Comprueba la URL.</p>
-    </div>
+    <p id="emptyState" class="hidden text-center py-20 text-gray-400 text-base">
+      🐕 No se encontraron perros. Comprueba la URL e inténtalo de nuevo.
+    </p>
   </main>
 
-  <script>
-    let currentSource = null;
+<script>
+// ── Detect context ─────────────────────────────────────────────────────────────
+// Running as a Chrome extension: background worker handles fetch (no CORS).
+// Running from file:// or http://localhost: try public CORS proxy as fallback.
+const IS_EXT = typeof chrome !== 'undefined' && !!chrome.runtime?.id;
 
-    const STATUS_COLOR = {
-      'Disponible':       'bg-green-100 text-green-700',
-      'Reservado':        'bg-yellow-100 text-yellow-700',
-      'Adoptado':         'bg-gray-100 text-gray-400',
-      'Acogida temporal': 'bg-blue-100 text-blue-700',
-    };
+document.getElementById('modeTag').textContent = IS_EXT
+  ? '✅ Modo extensión — sin servidor, sin CORS'
+  : '⚠️ Modo standalone — usa una extensión Chrome para mejores resultados';
 
-    function startCrawl() {
-      const url = document.getElementById('urlInput').value.trim();
-      if (!url) return;
+// ── Fetch abstraction ──────────────────────────────────────────────────────────
+const FALLBACK_PROXY = 'https://api.allorigins.win/raw?url=';
 
-      // Stop previous stream if any
-      if (currentSource) { currentSource.close(); currentSource = null; }
-
-      // Reset UI
-      document.getElementById('grid').innerHTML = '';
-      document.getElementById('totalBadge').textContent = '0';
-      document.getElementById('resultsHeader').classList.add('hidden');
-      document.getElementById('emptyState').classList.add('hidden');
-      document.getElementById('progressSection').classList.remove('hidden');
-      setProgress(0, '', 'Cargando listado...', '⏳', '');
-
-      // Disable button
-      const btn = document.getElementById('searchBtn');
-      btn.disabled = true;
-      btn.classList.add('opacity-60', 'cursor-not-allowed');
-      document.getElementById('btnIcon').textContent = '⏳';
-      document.getElementById('btnText').textContent = 'Buscando...';
-
-      const source = new EventSource(`/crawl?url=${encodeURIComponent(url)}`);
-      currentSource = source;
-
-      source.addEventListener('progress', e => {
-        const { phase, current, total, name } = JSON.parse(e.data);
-        if (phase === 'listing') {
-          setProgress(5, `${total} perros en el listado`, 'Obteniendo perfiles individuales...', '🔗', '');
-          document.getElementById('resultsHeader').classList.remove('hidden');
-        } else {
-          const pct = Math.round((current / total) * 100);
-          setProgress(pct, `${current} / ${total} perros`, 'Obteniendo perfiles...', '🔍', name ? `Procesando: ${name}` : '');
-        }
+async function fetchHTML(url, signal) {
+  if (IS_EXT) {
+    // Route through background.js which has host_permissions and bypasses CORS
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: 'fetch', url }, response => {
+        if (chrome.runtime.lastError)
+          return reject(new Error(chrome.runtime.lastError.message));
+        if (!response?.ok)
+          return reject(new Error(response?.error ?? 'Fetch failed'));
+        resolve(response.html);
       });
-
-      source.addEventListener('dog', e => {
-        const dog = JSON.parse(e.data);
-        appendDogCard(dog);
-        const badge = document.getElementById('totalBadge');
-        badge.textContent = parseInt(badge.textContent || 0) + 1;
-      });
-
-      source.addEventListener('done', e => {
-        const { total } = JSON.parse(e.data);
-        setProgress(100, `${total} perros`, 'Completado', '✅', '');
-        document.getElementById('phaseLabel').textContent = `✅ ${total} perros cargados`;
-        setTimeout(() => {
-          document.getElementById('progressSection').classList.add('hidden');
-        }, 2000);
-        resetButton();
-        source.close();
-        if (total === 0) document.getElementById('emptyState').classList.remove('hidden');
-      });
-
-      source.addEventListener('error', e => {
-        let msg = 'Error al conectar con el servidor';
-        try { msg = JSON.parse(e.data).message; } catch {}
-        document.getElementById('phaseLabel').textContent = `❌ ${msg}`;
-        document.getElementById('progressFill').classList.replace('bg-amber-400', 'bg-red-400');
-        resetButton();
-        source.close();
-      });
-
-      source.onerror = () => {
-        if (source.readyState === EventSource.CLOSED) {
-          resetButton();
-        }
-      };
-    }
-
-    function setProgress(pct, count, label, icon, dogName) {
-      document.getElementById('progressFill').style.width = pct + '%';
-      document.getElementById('progressCount').textContent = count;
-      document.getElementById('phaseLabel').textContent = label;
-      document.getElementById('phaseIcon').textContent = icon;
-      document.getElementById('currentDog').textContent = dogName;
-    }
-
-    function resetButton() {
-      const btn = document.getElementById('searchBtn');
-      btn.disabled = false;
-      btn.classList.remove('opacity-60', 'cursor-not-allowed');
-      document.getElementById('btnIcon').textContent = '🔍';
-      document.getElementById('btnText').textContent = 'Buscar';
-    }
-
-    function appendDogCard(dog) {
-      const grid = document.getElementById('grid');
-      const img = dog.imageHD || dog.image;
-      const statusCls = STATUS_COLOR[dog.status] || 'bg-gray-100 text-gray-500';
-
-      const pills = [
-        dog.breed     && pill(dog.breed,     'bg-amber-100 text-amber-800'),
-        dog.lifeStage && pill(dog.lifeStage,  'bg-blue-100 text-blue-800'),
-        dog.gender    && pill(dog.gender,     dog.gender === 'Macho' ? 'bg-sky-100 text-sky-700' : 'bg-pink-100 text-pink-700'),
-        dog.size      && pill(dog.size,       'bg-indigo-100 text-indigo-700'),
-      ].filter(Boolean).join('');
-
-      const deliverables = dog.deliverables?.length
-        ? `<div class="flex flex-wrap gap-1 mt-2">
-            ${dog.deliverables.map(d => `<span class="text-xs bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 rounded">${esc(d)}</span>`).join('')}
-           </div>` : '';
-
-      const personality = dog.personality?.length
-        ? `<div class="flex flex-wrap gap-1 mt-1">
-            ${dog.personality.map(p => `<span class="text-xs bg-violet-50 text-violet-600 border border-violet-200 px-1.5 py-0.5 rounded">${esc(p)}</span>`).join('')}
-           </div>` : '';
-
-      const description = dog.description
-        ? `<p class="text-xs text-gray-500 mt-2 line-clamp-3">${esc(dog.description.slice(0, 220))}${dog.description.length > 220 ? '…' : ''}</p>`
-        : '';
-
-      const locationLine = [
-        dog.tipo === 'Protectora' ? '🏠' : dog.tipo === 'Particular' ? '👤' : '',
-        dog.location ? dog.location : '',
-      ].filter(Boolean).join(' ');
-
-      const card = document.createElement('div');
-      card.className = 'dog-card bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col';
-      card.style.animationDelay = '0ms';
-      card.innerHTML = `
-        <div class="relative">
-          ${img
-            ? `<div class="h-44 overflow-hidden bg-stone-100">
-                 <img src="${esc(img)}" alt="${esc(dog.name || '')}"
-                   class="w-full h-full object-cover"
-                   onerror="this.parentElement.innerHTML='<div class=\\'h-44 bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center text-4xl\\'>🐕</div>'" />
-               </div>`
-            : `<div class="h-44 bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center text-4xl">🐕</div>`
-          }
-          ${dog.status
-            ? `<span class="absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm ${statusCls}">${esc(dog.status)}</span>`
-            : ''
-          }
-        </div>
-        <div class="p-3 flex flex-col gap-1.5 flex-1">
-          <h2 class="text-sm font-bold text-gray-800">${esc(dog.name || 'Sin nombre')}</h2>
-          <div class="flex flex-wrap gap-1">${pills}</div>
-          ${dog.ageText ? `<p class="text-xs text-gray-400">🎂 ${esc(dog.ageText)}</p>` : ''}
-          ${description}
-          ${personality}
-          ${deliverables}
-          ${locationLine ? `<p class="text-xs text-gray-400 mt-auto pt-1">${esc(locationLine)}</p>` : ''}
-          ${dog.link
-            ? `<a href="${esc(dog.link)}" target="_blank" rel="noopener"
-                 class="mt-1 block text-center bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold py-2 rounded-xl transition-colors duration-150">
-                 Ver perfil →
-               </a>`
-            : ''
-          }
-        </div>`;
-      grid.appendChild(card);
-    }
-
-    function pill(text, cls) {
-      return `<span class="text-xs px-2 py-0.5 rounded-full font-medium ${cls}">${esc(text)}</span>`;
-    }
-
-    function esc(str) {
-      return String(str ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-
-    // Allow Enter key in input
-    document.getElementById('urlInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') startCrawl();
     });
-  </script>
+  }
+  // Fallback: CORS proxy (may fail for Cloudflare-protected sites)
+  const res = await fetch(FALLBACK_PROXY + encodeURIComponent(url), { signal });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.text();
+}
+
+async function fetchDoc(url, signal) {
+  const html = await fetchHTML(url, signal);
+  return new DOMParser().parseFromString(html, 'text/html');
+}
+
+function resolveHref(href, base) {
+  if (!href) return null;
+  if (href.startsWith('http')) return href;
+  try { return new URL(href, base).toString(); } catch { return null; }
+}
+
+// ── Listing extractor (miwuki.com) ─────────────────────────────────────────────
+function extractListing(doc, baseUrl) {
+  const origin = new URL(baseUrl).origin;
+
+  // Miwuki-specific: div.caso cards
+  const cases = doc.querySelectorAll('div.caso');
+  if (cases.length > 0) {
+    return Array.from(cases).map(card => {
+      const link     = card.querySelector('a[href]');
+      const img      = card.querySelector('div.foto img');
+      const nombreEl = card.querySelector('div.nombre');
+
+      const nameNode = Array.from(nombreEl?.childNodes ?? [])
+        .find(n => n.nodeType === 3 && n.textContent.trim());
+      const name = nameNode?.textContent.trim()
+        || img?.getAttribute('alt')?.replace(/^Adopta a\s*/i, '').trim()
+        || null;
+
+      const estadoClass = card.querySelector('div.estado')?.classList[1] ?? null;
+      const STATUS = { e1:'Disponible', e2:'Reservado', e3:'Adoptado', e4:'Acogida temporal' };
+
+      const tipoIcon = card.querySelector('div.tipo i');
+
+      return {
+        name,
+        location: nombreEl?.querySelector('span')?.textContent.trim() || null,
+        status:   STATUS[estadoClass] ?? null,
+        tipo:     tipoIcon?.classList.contains('fa-house') ? 'Protectora' : 'Particular',
+        image:    img?.getAttribute('src') || null,
+        link:     resolveHref(link?.getAttribute('href'), origin),
+      };
+    });
+  }
+
+  // Generic fallback
+  const selectors = ['[class*="AnimalCard"]','[class*="animal-card"]',
+                     '[class*="PetCard"]','[class*="pet-card"]','article[class*="card"]'];
+  let cards = [];
+  for (const sel of selectors) { cards = [...doc.querySelectorAll(sel)]; if (cards.length) break; }
+  if (!cards.length) {
+    cards = [...doc.querySelectorAll('a[href]')]
+      .filter(a => /adopc|perro|animal|mascota|dog/i.test(a.getAttribute('href') ?? '') && a.querySelector('img'));
+  }
+  return cards.map(card => {
+    const img    = card.querySelector('img');
+    const nameEl = card.querySelector('h1,h2,h3,h4,[class*="name"],[class*="nombre"]');
+    const linkEl = card.tagName === 'A' ? card : card.querySelector('a[href]');
+    return {
+      name:  nameEl?.textContent?.trim() || img?.getAttribute('alt')?.replace(/^Adopta a\s*/i,'').trim() || null,
+      image: img?.getAttribute('src') || null,
+      link:  resolveHref(linkEl?.getAttribute('href'), origin),
+    };
+  });
+}
+
+// ── Detail extractor (miwuki.com profile page) ─────────────────────────────────
+function extractDetail(doc) {
+  const genderIcon = doc.querySelector('h1 i.fa-mars, h1 i.fa-venus');
+  const gender = genderIcon?.getAttribute('title')
+    || doc.querySelector('h1 .sr-only')?.textContent.trim()
+    || null;
+
+  const mainImg = doc.querySelector('.col-md-3 img, .col-12.col-md-3 img');
+  const imageHD = mainImg?.getAttribute('src')?.replace(/\/\d+$/, '/800') || null;
+
+  const gallery = [...doc.querySelectorAll('div.fotos a[href]')]
+    .map(a => a.getAttribute('href')).filter(Boolean);
+
+  // "Mis datos" — each div.col has value text + <span> label
+  const dataFields = {};
+  doc.querySelectorAll('div.row.detalles div[class^="col"]').forEach(div => {
+    const label = div.querySelector('span')?.textContent.trim();
+    if (!label) return;
+    const value = div.textContent.replace(label, '').trim().replace(/\s+/g, ' ');
+    if (value) dataFields[label] = value;
+  });
+
+  // Age: walk direct childNodes to exclude the date nested inside <span><small>
+  let ageText = null;
+  const ageDiv = [...doc.querySelectorAll('div.row.detalles div[class^="col"]')]
+    .find(d => d.querySelector('span small'));
+  if (ageDiv) {
+    const parts = [];
+    ageDiv.childNodes.forEach(n => {
+      if (n.nodeType === 3) { const t = n.textContent.trim(); if (t) parts.push(t); }
+      else if (n.nodeName === 'SMALL' && !n.textContent.includes('-')) parts.push(n.textContent.trim());
+    });
+    ageText = parts.join(' ').trim() || null;
+  }
+
+  const personality  = [...doc.querySelectorAll('div.pills span')].map(s => s.textContent.trim()).filter(Boolean);
+  const deliverables = [...doc.querySelectorAll('ul.entrega li')].map(li => li.textContent.trim()).filter(Boolean);
+
+  let description = null;
+  doc.querySelectorAll('h2').forEach(h2 => {
+    if (/historia/i.test(h2.textContent))
+      description = h2.nextElementSibling?.textContent.trim() || null;
+  });
+
+  const w = dataFields['Peso'];
+  return {
+    gender, imageHD, gallery,
+    breed:         dataFields['Raza'] || null,
+    ageText,
+    lifeStage:     dataFields['Edad'] || null,
+    size:          dataFields['Tamaño'] || null,
+    weight:        w && !/^0?\s*kg$/.test(w.trim()) ? w : null,
+    activityLevel: dataFields['Nivel Actividad'] || null,
+    personality, deliverables, description,
+  };
+}
+
+// ── Concurrency pool ───────────────────────────────────────────────────────────
+async function withPool(items, fn, concurrency) {
+  let idx = 0;
+  const worker = async () => {
+    while (idx < items.length) {
+      const i = idx++;
+      await fn(items[i], i);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
+}
+
+// ── Main search ────────────────────────────────────────────────────────────────
+let abortCtrl = null;
+
+async function startSearch() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) return;
+
+  if (abortCtrl) abortCtrl.abort();
+  abortCtrl = new AbortController();
+  const { signal } = abortCtrl;
+
+  // Reset UI
+  document.getElementById('grid').innerHTML = '';
+  document.getElementById('totalBadge').textContent = '0';
+  document.getElementById('resultsHeader').classList.add('hidden');
+  document.getElementById('emptyState').classList.add('hidden');
+  document.getElementById('errorBox').classList.add('hidden');
+  document.getElementById('progressSection').classList.remove('hidden');
+  setProgress(3, '', 'Cargando listado...', '⏳', '');
+  setBusy(true);
+
+  try {
+    // Step 1 — listing
+    const listDoc = await fetchDoc(url, signal);
+    let dogs = extractListing(listDoc, url).filter(d => d.name || d.image);
+
+    if (dogs.length === 0) {
+      document.getElementById('emptyState').classList.remove('hidden');
+      setProgress(100, '', 'Sin resultados', '🤷', '');
+      return;
+    }
+
+    document.getElementById('resultsHeader').classList.remove('hidden');
+    setProgress(5, `${dogs.length} perros`, 'Obteniendo perfiles...', '🔗', '');
+
+    // Step 2 — detail pages in parallel (4 concurrent)
+    let done = 0;
+    const total = dogs.length;
+
+    await withPool(dogs, async (dog, i) => {
+      if (signal.aborted) return;
+      if (dog.link) {
+        try {
+          const detailDoc = await fetchDoc(dog.link, signal);
+          dogs[i] = { ...dog, ...extractDetail(detailDoc) };
+        } catch (e) {
+          if (e.name === 'AbortError') return;
+        }
+      }
+      done++;
+      setProgress(
+        Math.round(5 + (done / total) * 95),
+        `${done} / ${total}`,
+        'Obteniendo perfiles...',
+        '🔍',
+        `Procesando: ${dog.name}`
+      );
+      appendCard(dogs[i]);
+      document.getElementById('totalBadge').textContent = done;
+    }, 4);
+
+    if (!signal.aborted) {
+      setProgress(100, `${total} perros`, `${total} perros cargados`, '✅', '');
+      setTimeout(() => document.getElementById('progressSection').classList.add('hidden'), 2000);
+    }
+
+  } catch (err) {
+    if (err.name === 'AbortError') return;
+    document.getElementById('errorMsg').textContent = err.message;
+    document.getElementById('errorHint').textContent = IS_EXT
+      ? 'Asegúrate de que la URL es correcta y la extensión tiene acceso al dominio.'
+      : 'Carga esto como extensión de Chrome para evitar problemas de CORS.';
+    document.getElementById('errorBox').classList.remove('hidden');
+    setProgress(0, '', 'Error al cargar', '❌', '');
+  } finally {
+    setBusy(false);
+  }
+}
+
+// ── UI helpers ─────────────────────────────────────────────────────────────────
+function setProgress(pct, count, label, icon, dog) {
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressCount').textContent = count;
+  document.getElementById('phaseLabel').textContent = label;
+  document.getElementById('phaseIcon').textContent = icon;
+  document.getElementById('currentDog').textContent = dog;
+}
+
+function setBusy(busy) {
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = busy;
+  btn.classList.toggle('opacity-60', busy);
+  btn.classList.toggle('cursor-not-allowed', busy);
+  document.getElementById('btnIcon').textContent = busy ? '⏳' : '🔍';
+  document.getElementById('btnText').textContent  = busy ? 'Buscando...' : 'Buscar';
+}
+
+const STATUS_CLS = {
+  'Disponible':       'bg-green-100 text-green-700',
+  'Reservado':        'bg-yellow-100 text-yellow-700',
+  'Adoptado':         'bg-gray-100 text-gray-400',
+  'Acogida temporal': 'bg-blue-100 text-blue-700',
+};
+
+function pill(text, cls) {
+  return `<span class="text-xs px-2 py-0.5 rounded-full font-medium ${cls}">${esc(text)}</span>`;
+}
+
+function appendCard(dog) {
+  const img = dog.imageHD || dog.image;
+
+  const pills = [
+    dog.breed     && pill(dog.breed,     'bg-amber-100 text-amber-800'),
+    dog.lifeStage && pill(dog.lifeStage, 'bg-blue-100 text-blue-800'),
+    dog.gender    && pill(dog.gender,    dog.gender === 'Macho' ? 'bg-sky-100 text-sky-700' : 'bg-pink-100 text-pink-700'),
+    dog.size      && pill(dog.size,      'bg-indigo-100 text-indigo-700'),
+  ].filter(Boolean).join('');
+
+  const deliverables = dog.deliverables?.length
+    ? `<div class="flex flex-wrap gap-1 mt-2">${dog.deliverables.map(d =>
+        `<span class="text-xs bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 rounded">${esc(d)}</span>`
+      ).join('')}</div>` : '';
+
+  const personality = dog.personality?.length
+    ? `<div class="flex flex-wrap gap-1 mt-1">${dog.personality.map(p =>
+        `<span class="text-xs bg-violet-50 text-violet-600 border border-violet-200 px-1.5 py-0.5 rounded">${esc(p)}</span>`
+      ).join('')}</div>` : '';
+
+  const description = dog.description
+    ? `<p class="text-xs text-gray-500 mt-2 line-clamp-3">${esc(dog.description.slice(0, 220))}${dog.description.length > 220 ? '…' : ''}</p>`
+    : '';
+
+  const locationLine = [
+    dog.tipo === 'Protectora' ? '🏠' : dog.tipo === 'Particular' ? '👤' : '',
+    dog.location ?? '',
+  ].filter(Boolean).join(' ');
+
+  const card = document.createElement('div');
+  card.className = 'dog-card bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col';
+  card.innerHTML = `
+    <div class="relative">
+      ${img
+        ? `<div class="h-44 overflow-hidden bg-stone-100">
+             <img src="${esc(img)}" alt="${esc(dog.name ?? '')}" loading="lazy"
+               class="w-full h-full object-cover"
+               onerror="this.parentElement.innerHTML='<div class=\\'h-44 bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center text-4xl\\'>🐕</div>'" />
+           </div>`
+        : `<div class="h-44 bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center text-4xl">🐕</div>`
+      }
+      ${dog.status
+        ? `<span class="absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm ${STATUS_CLS[dog.status] ?? 'bg-gray-100 text-gray-500'}">${esc(dog.status)}</span>`
+        : ''
+      }
+    </div>
+    <div class="p-3 flex flex-col gap-1.5 flex-1">
+      <h2 class="text-sm font-bold text-gray-800">${esc(dog.name ?? 'Sin nombre')}</h2>
+      <div class="flex flex-wrap gap-1">${pills}</div>
+      ${dog.ageText ? `<p class="text-xs text-gray-400">🎂 ${esc(dog.ageText)}</p>` : ''}
+      ${dog.weight  ? `<p class="text-xs text-gray-400">⚖️ ${esc(dog.weight)}</p>`  : ''}
+      ${description}
+      ${personality}
+      ${deliverables}
+      ${locationLine ? `<p class="text-xs text-gray-400 mt-auto pt-1">${esc(locationLine)}</p>` : ''}
+      ${dog.link
+        ? `<a href="${esc(dog.link)}" target="_blank" rel="noopener"
+             class="mt-1 block text-center bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold py-2 rounded-xl transition-colors">
+             Ver perfil →
+           </a>`
+        : ''
+      }
+    </div>`;
+  document.getElementById('grid').appendChild(card);
+}
+
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+document.getElementById('urlInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startSearch();
+});
+</script>
 </body>
 </html>

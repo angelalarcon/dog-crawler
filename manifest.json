@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Perros en Adopción Madrid",
+  "version": "1.0",
+  "description": "Busca perros en adopción sin necesidad de servidor",
+  "permissions": ["tabs"],
+  "host_permissions": [
+    "https://petshelter.miwuki.com/*",
+    "https://img.miwuki.com/*",
+    "https://*.miwuki.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Perros en Adopción"
+  },
+  "icons": {}
+}
