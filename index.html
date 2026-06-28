@@ -107,15 +107,13 @@
 const IS_EXT = typeof chrome !== 'undefined' && !!chrome.runtime?.id;
 
 document.getElementById('modeTag').textContent = IS_EXT
-  ? '✅ Modo extensión — sin servidor, sin CORS'
-  : '⚠️ Modo standalone — usa una extensión Chrome para mejores resultados';
+  ? '✅ Modo extensión Chrome'
+  : '✅ Powered by Netlify Functions';
 
 // ── Fetch abstraction ──────────────────────────────────────────────────────────
-const FALLBACK_PROXY = 'https://api.allorigins.win/raw?url=';
-
 async function fetchHTML(url, signal) {
   if (IS_EXT) {
-    // Route through background.js which has host_permissions and bypasses CORS
+    // Chrome extension: route through background.js (bypasses CORS via host_permissions)
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage({ type: 'fetch', url }, response => {
         if (chrome.runtime.lastError)
@@ -126,9 +124,10 @@ async function fetchHTML(url, signal) {
       });
     });
   }
-  // Fallback: CORS proxy (may fail for Cloudflare-protected sites)
-  const res = await fetch(FALLBACK_PROXY + encodeURIComponent(url), { signal });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  // Netlify Function proxy — same origin, no CORS issues
+  const proxyUrl = `/.netlify/functions/proxy?url=${encodeURIComponent(url)}`;
+  const res = await fetch(proxyUrl, { signal });
+  if (!res.ok) throw new Error(`HTTP ${res.status} al cargar la página`);
   return res.text();
 }
 
@@ -336,9 +335,7 @@ async function startSearch() {
   } catch (err) {
     if (err.name === 'AbortError') return;
     document.getElementById('errorMsg').textContent = err.message;
-    document.getElementById('errorHint').textContent = IS_EXT
-      ? 'Asegúrate de que la URL es correcta y la extensión tiene acceso al dominio.'
-      : 'Carga esto como extensión de Chrome para evitar problemas de CORS.';
+    document.getElementById('errorHint').textContent = 'Asegúrate de que la URL es correcta e inténtalo de nuevo.';
     document.getElementById('errorBox').classList.remove('hidden');
     setProgress(0, '', 'Error al cargar', '❌', '');
   } finally {
