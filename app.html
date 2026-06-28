@@ -16,8 +16,8 @@
     @keyframes tf-in{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
     @keyframes tf-out{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-20px)}}
     .tf-step{display:none;flex-direction:column;align-items:flex-start;width:100%;max-width:580px}
-    .tf-step.active{display:flex;animation:tf-in 0.38s cubic-bezier(.22,1,.36,1) both}
-    .tf-step.leaving{display:flex;animation:tf-out 0.22s ease both;pointer-events:none}
+    .tf-step.active{animation:tf-in 0.38s cubic-bezier(.22,1,.36,1) both}
+    .tf-step.leaving{animation:tf-out 0.22s ease both;pointer-events:none}
 
     .tf-num{color:#f59e0b;font-size:.8rem;font-weight:700;letter-spacing:.06em;margin-bottom:.6rem}
     .tf-title{font-size:clamp(1.6rem,4vw,2.1rem);font-weight:800;color:#1c1917;line-height:1.2;margin-bottom:.5rem}
@@ -124,7 +124,7 @@
   <div id="tfContainer" class="flex-1 flex items-center justify-center px-6 py-10 overflow-y-auto">
 
     <!-- 1 · Nombre -->
-    <div class="tf-step active" id="tf-nombre">
+    <div class="tf-step" id="tf-nombre">
       <div class="tf-num">1 →</div>
       <h2 class="tf-title">¿Cómo te llamas?</h2>
       <input id="reg_nombre" type="text" autocomplete="name" class="tf-input" placeholder="Tu nombre completo"
@@ -591,8 +591,13 @@ function getTfFlow() {
 
 function openTypeform() {
   tfCurrent = 0;
-  document.querySelectorAll('.tf-step').forEach(s => s.classList.remove('active','leaving'));
-  document.getElementById('tf-nombre').classList.add('active');
+  document.querySelectorAll('.tf-step').forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('active','leaving');
+  });
+  const first = document.getElementById('tf-nombre');
+  first.style.display = 'flex';
+  first.classList.add('active');
   document.getElementById('typeformView').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
   updateTfUI();
@@ -614,9 +619,11 @@ function tfNext() {
   const cur = document.getElementById(stepId);
   cur.classList.add('leaving');
   setTimeout(() => {
+    cur.style.display = 'none';
     cur.classList.remove('active','leaving');
     tfCurrent++;
     const next = document.getElementById(flow[tfCurrent]);
+    next.style.display = 'flex';
     next.classList.add('active');
     updateTfUI();
     const inp = next.querySelector('input[type="text"],input[type="email"],input[type="password"]');
@@ -628,11 +635,15 @@ function tfBack() {
   if (tfCurrent === 0) return;
   clearTimeout(tfAutoTimer);
   const flow = getTfFlow();
-  document.getElementById(flow[tfCurrent]).classList.remove('active','leaving');
+  const cur = document.getElementById(flow[tfCurrent]);
+  cur.style.display = 'none';
+  cur.classList.remove('active','leaving');
   tfCurrent--;
-  document.getElementById(flow[tfCurrent]).classList.add('active');
+  const prev = document.getElementById(flow[tfCurrent]);
+  prev.style.display = 'flex';
+  prev.classList.add('active');
   updateTfUI();
-  const inp = document.getElementById(flow[tfCurrent]).querySelector('input[type="text"],input[type="email"],input[type="password"]');
+  const inp = prev.querySelector('input[type="text"],input[type="email"],input[type="password"]');
   if (inp) setTimeout(() => inp.focus(), 150);
 }
 
