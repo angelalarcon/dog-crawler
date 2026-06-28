@@ -106,6 +106,8 @@
 // Running from file:// or http://localhost: try public CORS proxy as fallback.
 const IS_EXT = typeof chrome !== 'undefined' && !!chrome.runtime?.id;
 
+function isWonder(url) { return url.includes('lahuelladewonder.es'); }
+
 document.getElementById('modeTag').textContent = IS_EXT
   ? '✅ Modo extensión Chrome'
   : '✅ Powered by Netlify Functions';
@@ -197,6 +199,45 @@ function extractListing(doc, baseUrl) {
   });
 }
 
+// ── Listing extractor (lahuelladewonder.es — WooCommerce) ──────────────────────
+function extractListingWonder(doc, baseUrl) {
+  return Array.from(doc.querySelectorAll('li.product')).map(li => {
+    const linkEl = li.querySelector('a.woocommerce-LoopProduct-link');
+    const img    = li.querySelector('img.attachment-woocommerce_thumbnail');
+    const nameEl = li.querySelector('h2.woocommerce-loop-product__title');
+
+    const srcset = img?.getAttribute('srcset') || '';
+    let image = img?.getAttribute('src') || null;
+    if (srcset) {
+      const best = srcset.split(',')
+        .map(s => { const p = s.trim().split(/\s+/); return { url: p[0], w: parseInt(p[1]) || 0 }; })
+        .sort((a, b) => b.w - a.w)[0];
+      if (best?.url) image = best.url;
+    }
+    return {
+      name:   nameEl?.textContent?.trim() || img?.getAttribute('alt')?.trim() || null,
+      image, source: 'wonder',
+      link:   resolveHref(linkEl?.getAttribute('href'), baseUrl),
+    };
+  });
+}
+
+function getPaginationUrls(doc, baseUrl) {
+  const pages = new Set();
+  doc.querySelectorAll('ul.page-numbers a.page-numbers[href]').forEach(a => {
+    const m = (a.getAttribute('href') || '').match(/product-page=(\d+)/);
+    if (m) pages.add(parseInt(m[1]));
+  });
+  if (!pages.size) return [];
+  const base = new URL(baseUrl);
+  base.searchParams.delete('product-page');
+  return [...pages].sort((a, b) => a - b).map(n => {
+    const u = new URL(base.toString());
+    u.searchParams.set('product-page', n);
+    return u.toString();
+  });
+}
+
 // ── Detail extractor (miwuki.com profile page) ─────────────────────────────────
 function extractDetail(doc) {
   const genderIcon = doc.querySelector('h1 i.fa-mars, h1 i.fa-venus');
@@ -254,6 +295,60 @@ function extractDetail(doc) {
   };
 }
 
+// ── Detail extractor (lahuelladewonder.es profile page) ───────────────────────
+function extractDetailWonder(doc) {
+  const metaDesc = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+  const lines = metaDesc.split('\n').map(l => l.trim()).filter(Boolean);
+
+  let gender = null;
+  if (lines.some(l => l.includes('♀'))) gender = 'Hembra';
+  else if (lines.some(l => l.includes('♂'))) gender = 'Macho';
+
+  let ageText = null;
+  const ageLine = lines.find(l => l.includes('🎂'));
+  if (ageLine) {
+    const m = ageLine.match(/\(([^)]+)\)/);
+    ageText = m ? m[1].split(' - ')[0].trim() : ageLine.replace(/.*🎂\s*/, '').trim();
+  }
+
+  let breed = null;
+  const breedLine = lines.find(l => l.includes('🐕'));
+  if (breedLine) {
+    const m = breedLine.match(/Raza:\s*(.+)/i);
+    breed = m ? m[1].trim() : breedLine.replace(/.*🐕\s*/, '').trim();
+  }
+
+  let character = null;
+  const charLine = lines.find(l => l.includes('👤'));
+  if (charLine) {
+    const m = charLine.match(/Carácter:\s*(.+)/i);
+    character = m ? m[1].trim() : charLine.replace(/.*👤\s*/, '').trim();
+  }
+
+  let location = null;
+  const locLine = lines.find(l => l.includes('📍'));
+  if (locLine) location = locLine.replace(/.*📍\s*/, '').trim();
+
+  const emojiSet = ['🧡','🐾','♀','♂','🎂','🐕','👤','📍','🙏','❓','🐶','✅','❌'];
+  const description = lines.filter(l => !emojiSet.some(e => l.includes(e))).join(' ').trim() || null;
+
+  const mainImgEl = doc.querySelector('.woocommerce-product-gallery__image img[data-large_image]');
+  const imageHD = mainImgEl?.getAttribute('data-large_image')
+    || mainImgEl?.getAttribute('data-src')
+    || doc.querySelector('img.wp-post-image')?.getAttribute('src')
+    || null;
+
+  const gallery = [...doc.querySelectorAll('.woocommerce-product-gallery__image a[href]')]
+    .map(a => a.getAttribute('href')).filter(Boolean);
+
+  return {
+    gender, imageHD, gallery, breed, ageText, location,
+    lifeStage: null, size: null, weight: null, activityLevel: null,
+    personality: character ? [character] : [],
+    deliverables: [], description,
+  };
+}
+
 // ── Concurrency pool ───────────────────────────────────────────────────────────
 async function withPool(items, fn, concurrency) {
   let idx = 0;
@@ -288,9 +383,26 @@ async function startSearch() {
   setBusy(true);
 
   try {
-    // Step 1 — listing
+    // Step 1 — listing (Wonder: multi-page; Miwuki: single page)
     const listDoc = await fetchDoc(url, signal);
-    let dogs = extractListing(listDoc, url).filter(d => d.name || d.image);
+    let dogs;
+
+    if (isWonder(url)) {
+      dogs = extractListingWonder(listDoc, url);
+      const morePages = getPaginationUrls(listDoc, url);
+      if (morePages.length > 0) {
+        setProgress(4, '', `Cargando ${morePages.length + 1} páginas...`, '📄', '');
+        for (const pageUrl of morePages) {
+          if (signal.aborted) break;
+          const pageDoc = await fetchDoc(pageUrl, signal);
+          dogs.push(...extractListingWonder(pageDoc, url));
+        }
+      }
+    } else {
+      dogs = extractListing(listDoc, url);
+    }
+
+    dogs = dogs.filter(d => d.name || d.image);
 
     if (dogs.length === 0) {
       document.getElementById('emptyState').classList.remove('hidden');
@@ -310,7 +422,8 @@ async function startSearch() {
       if (dog.link) {
         try {
           const detailDoc = await fetchDoc(dog.link, signal);
-          dogs[i] = { ...dog, ...extractDetail(detailDoc) };
+          const detailFn = dog.source === 'wonder' ? extractDetailWonder : extractDetail;
+          dogs[i] = { ...dog, ...detailFn(detailDoc) };
         } catch (e) {
           if (e.name === 'AbortError') return;
         }
@@ -396,10 +509,8 @@ function appendCard(dog) {
     ? `<p class="text-xs text-gray-500 mt-2 line-clamp-3">${esc(dog.description.slice(0, 220))}${dog.description.length > 220 ? '…' : ''}</p>`
     : '';
 
-  const locationLine = [
-    dog.tipo === 'Protectora' ? '🏠' : dog.tipo === 'Particular' ? '👤' : '',
-    dog.location ?? '',
-  ].filter(Boolean).join(' ');
+  const locationIcon = dog.tipo === 'Protectora' ? '🏠' : dog.tipo === 'Particular' ? '👤' : (dog.location ? '📍' : '');
+  const locationLine = [locationIcon, dog.location ?? ''].filter(Boolean).join(' ');
 
   const card = document.createElement('div');
   card.className = 'dog-card bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col';

@@ -1,2 +1,9 @@
 node_modules/
 output/
+
+# Local Netlify folder
+.netlify
+
+# Debug/inspection artifacts
+inspect-*.mjs
+wonder-*.html

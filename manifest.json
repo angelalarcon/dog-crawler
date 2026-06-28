@@ -7,7 +7,9 @@
   "host_permissions": [
     "https://petshelter.miwuki.com/*",
     "https://img.miwuki.com/*",
-    "https://*.miwuki.com/*"
+    "https://*.miwuki.com/*",
+    "https://www.lahuelladewonder.es/*",
+    "https://*.lahuelladewonder.es/*"
   ],
   "background": {
     "service_worker": "background.js"
