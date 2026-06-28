@@ -7,3 +7,5 @@ output/
 # Debug/inspection artifacts
 inspect-*.mjs
 wonder-*.html
+mascomad-*.html
+/tmp/mc*.txt

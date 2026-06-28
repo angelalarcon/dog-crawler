@@ -106,7 +106,8 @@
 // Running from file:// or http://localhost: try public CORS proxy as fallback.
 const IS_EXT = typeof chrome !== 'undefined' && !!chrome.runtime?.id;
 
-function isWonder(url) { return url.includes('lahuelladewonder.es'); }
+function isWonder(url)   { return url.includes('lahuelladewonder.es'); }
+function isMascomad(url) { return url.includes('mascomad.org'); }
 
 document.getElementById('modeTag').textContent = IS_EXT
   ? '✅ Modo extensión Chrome'
@@ -349,6 +350,83 @@ function extractDetailWonder(doc) {
   };
 }
 
+// ── MascoMad (mascomad.org) — API-based, no per-profile fetch needed ──────────
+async function fetchMascomadDogs(signal) {
+  const res = await fetch('/.netlify/functions/mascomad', { signal });
+  if (!res.ok) throw new Error(`MascoMad API error: HTTP ${res.status}`);
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return (json.data || []).map(mapMascomadDog);
+}
+
+// For the Chrome extension: same two-step flow in the background service worker
+async function fetchMascomadDogsExt(signal) {
+  const listHtml = await fetchHTML('https://www.mascomad.org/Animales/ListAnimales', signal);
+  const m = listHtml.match(/name="csrf-token" content="([^"]+)"/);
+  const csrfToken = m?.[1] ?? '';
+  // Extension fetch via background.js — pass method/headers/body as extras
+  const json = await new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage({
+      type: 'fetch',
+      url: 'https://www.mascomad.org/Animales/GetAnimalesFiltrados',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'RequestVerificationToken': csrfToken,
+        'Referer': 'https://www.mascomad.org/Animales/ListAnimales',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: JSON.stringify({ draw: 1, start: 0, length: 3000 }),
+    }, response => {
+      if (chrome.runtime.lastError) return reject(new Error(chrome.runtime.lastError.message));
+      if (!response?.ok) return reject(new Error(response?.error ?? 'Fetch failed'));
+      try { resolve(JSON.parse(response.html)); } catch { reject(new Error('JSON parse error')); }
+    });
+  });
+  return (json.data || []).map(mapMascomadDog);
+}
+
+function mapMascomadDog(r) {
+  const imgBase = 'https://www.mascomad.org';
+  const image = r.imagenPrincipalUrl ? imgBase + r.imagenPrincipalUrl : null;
+
+  // Extract profile link from cardAnimal HTML
+  const linkMatch = r.cardAnimal?.match(/href=["']([^"']+adopta[^"']+)["']/);
+  const link = linkMatch?.[1] || null;
+
+  const gender = r.genero === 'Hembra' ? 'Hembra' : r.genero === 'Macho' ? 'Macho' : null;
+
+  // Compute age from fechaNacimiento if edadTexto is missing
+  let ageText = r.edadTexto || null;
+  if (!ageText && r.fechaNacimiento) {
+    const born = new Date(r.fechaNacimiento);
+    const now = new Date();
+    const years = Math.floor((now - born) / (365.25 * 24 * 3600 * 1000));
+    if (years >= 1) ageText = `${years} año${years > 1 ? 's' : ''}`;
+    else {
+      const months = Math.floor((now - born) / (30.44 * 24 * 3600 * 1000));
+      ageText = `${months} mes${months !== 1 ? 'es' : ''}`;
+    }
+  }
+
+  return {
+    source: 'mascomad',
+    name:        r.nombre || null,
+    breed:       r.raza   || null,
+    gender,
+    size:        r.tamaño && r.tamaño !== 'No definido' ? r.tamaño : null,
+    ageText,
+    description: r.caracter || null,
+    location:    r.protectoraNombre || null,
+    image, imageHD: image,
+    link,
+    status: r.estadoAdopcion || null,
+    personality: [],
+    deliverables: [],
+    gallery: [],
+  };
+}
+
 // ── Concurrency pool ───────────────────────────────────────────────────────────
 async function withPool(items, fn, concurrency) {
   let idx = 0;
@@ -383,9 +461,31 @@ async function startSearch() {
   setBusy(true);
 
   try {
-    // Step 1 — listing (Wonder: multi-page; Miwuki: single page)
-    const listDoc = await fetchDoc(url, signal);
+    // Step 1 — listing
     let dogs;
+
+    if (isMascomad(url)) {
+      // MascoMad uses a DataTables JSON API — all data in one call, no per-dog fetch
+      setProgress(10, '', 'Consultando API de MascoMad...', '🔌', '');
+      dogs = IS_EXT
+        ? await fetchMascomadDogsExt(signal)
+        : await fetchMascomadDogs(signal);
+      dogs = dogs.filter(d => d.name || d.image);
+
+      if (dogs.length === 0) {
+        document.getElementById('emptyState').classList.remove('hidden');
+        setProgress(100, '', 'Sin resultados', '🤷', '');
+        return;
+      }
+      document.getElementById('resultsHeader').classList.remove('hidden');
+      setProgress(100, `${dogs.length} animales`, `${dogs.length} animales cargados`, '✅', '');
+      dogs.forEach(d => appendCard(d));
+      document.getElementById('totalBadge').textContent = dogs.length;
+      setTimeout(() => document.getElementById('progressSection').classList.add('hidden'), 2000);
+      return;
+    }
+
+    const listDoc = await fetchDoc(url, signal);
 
     if (isWonder(url)) {
       dogs = extractListingWonder(listDoc, url);

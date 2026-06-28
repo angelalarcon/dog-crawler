@@ -10,12 +10,17 @@ chrome.action.onClicked.addListener(() => {
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.type !== 'fetch') return;
 
-  fetch(msg.url, {
+  const options = {
+    method: msg.method || 'GET',
     headers: {
       'Accept-Language': 'es-ES,es;q=0.9',
       'User-Agent': navigator.userAgent,
+      ...(msg.headers || {}),
     },
-  })
+  };
+  if (msg.body) options.body = msg.body;
+
+  fetch(msg.url, options)
     .then(r => {
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.text();
@@ -23,5 +28,5 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     .then(html => sendResponse({ ok: true, html }))
     .catch(err => sendResponse({ ok: false, error: err.message }));
 
-  return true; // keep the message channel open for async sendResponse
+  return true;
 });
