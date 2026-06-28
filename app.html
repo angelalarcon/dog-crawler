@@ -581,8 +581,9 @@ const TF_BASE = ['tf-nombre','tf-email','tf-password','tf-tipo','tf-especie',
                  'tf-vivienda','tf-exterior','tf-horas','tf-menores','tf-experiencia'];
 
 let tfCurrent = 0;
-let tfAutoTimer = null;
-let tfErrTimer  = null;
+let tfAutoTimer    = null;
+let tfErrTimer     = null;
+let isTransitioning = false;
 
 function getTfFlow() {
   const tipo = document.querySelector('input[name="tipoSolicitud"]:checked')?.value;
@@ -591,6 +592,7 @@ function getTfFlow() {
 
 function openTypeform() {
   tfCurrent = 0;
+  isTransitioning = false;
   document.querySelectorAll('.tf-step').forEach(s => {
     s.style.display = 'none';
     s.classList.remove('active','leaving');
@@ -610,12 +612,13 @@ function closeTf() {
 }
 
 function tfNext() {
+  if (isTransitioning) return;
   const flow   = getTfFlow();
   const stepId = flow[tfCurrent];
   if (!validateTfStep(stepId)) return;
-
   if (tfCurrent >= flow.length - 1) { doRegister(); return; }
 
+  isTransitioning = true;
   const cur = document.getElementById(stepId);
   cur.classList.add('leaving');
   setTimeout(() => {
@@ -626,13 +629,14 @@ function tfNext() {
     next.style.display = 'flex';
     next.classList.add('active');
     updateTfUI();
+    isTransitioning = false;
     const inp = next.querySelector('input[type="text"],input[type="email"],input[type="password"]');
     if (inp) setTimeout(() => inp.focus(), 150);
   }, 230);
 }
 
 function tfBack() {
-  if (tfCurrent === 0) return;
+  if (isTransitioning || tfCurrent === 0) return;
   clearTimeout(tfAutoTimer);
   const flow = getTfFlow();
   const cur = document.getElementById(flow[tfCurrent]);
