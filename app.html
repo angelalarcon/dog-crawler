@@ -492,8 +492,21 @@ function resetSearch() {
 }
 
 // ── Tag computation ────────────────────────────────────────────────────────
+const CAT_RE  = /\bgat[oa]s?\b|felino|f[eé]lin[ao]|siamés|siames|persa\b|bengal[íi]|maine\s*coon|ragdoll|sphing?x|esfinge|abisini[oa]|angora|bosque\s*de\s*noruega/i;
+const DOG_RE  = /\bperr[oa]s?\b|canin[oa]|\bcan\b/i;
+
+function detectEspecieText(text) {
+  if (!text) return null;
+  if (CAT_RE.test(text)) return 'gato';
+  if (DOG_RE.test(text)) return 'perro';
+  return null;
+}
+
 function dogTags(dog) {
-  const t = { especie:'perro', sexo:null, etapa:null, tamaño:null, energia:null };
+  // Detect species — check explicit field first, then text heuristics
+  const textPool = [dog._rawEspecie, dog.breed, dog.name, dog.description].filter(Boolean).join(' ');
+  const especie  = detectEspecieText(textPool) || 'perro';
+  const t = { especie, sexo:null, etapa:null, tamaño:null, energia:null };
   if (dog.gender) {
     const g = dog.gender.toLowerCase();
     t.sexo = /hembra|female/.test(g) ? 'hembra' : /macho|male/.test(g) ? 'macho' : null;
@@ -753,6 +766,7 @@ function mapMascomadDog(r) {
     ageText = y>=1 ? `${y} año${y>1?'s':''}` : `${mo} mes${mo!==1?'es':''}`;
   }
   return { source:'mascomad', name:r.nombre||null, breed:r.raza||null,
+           _rawEspecie: r.especie||r.tipo||r.tipoAnimal||r.tipoMascota||null,
            gender: r.genero||null, size: r.tamaño&&r.tamaño!=='No definido'?r.tamaño:null,
            ageText, description:r.caracter||null, location:r.protectoraNombre||null,
            image, imageHD:image, link, status:r.estadoAdopcion||null,
