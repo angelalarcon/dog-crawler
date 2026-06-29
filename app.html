@@ -841,6 +841,7 @@ async function startAutoSearch() {
 
   const scored = allDogs
     .map(dog => ({ dog, score: calcMatch(prefs, dogTags(dog)) }))
+    .filter(({score}) => score > 0)
     .sort((a,b) => b.score - a.score)
     .slice(0, 300);
 
