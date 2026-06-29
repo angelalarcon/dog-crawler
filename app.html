@@ -492,20 +492,15 @@ function resetSearch() {
 }
 
 // ── Tag computation ────────────────────────────────────────────────────────
-const CAT_RE  = /\bgat[oa]s?\b|felino|f[eé]lin[ao]|siamés|siames|persa\b|bengal[íi]|maine\s*coon|ragdoll|sphing?x|esfinge|abisini[oa]|angora|bosque\s*de\s*noruega/i;
-const DOG_RE  = /\bperr[oa]s?\b|canin[oa]|\bcan\b/i;
-
-function detectEspecieText(text) {
-  if (!text) return null;
-  if (CAT_RE.test(text)) return 'gato';
-  if (DOG_RE.test(text)) return 'perro';
-  return null;
-}
+// Cat breed names — used ONLY against the breed field, never description
+const CAT_BREED_RE = /\bsiamés?\b|\bpersa\b|\bbengal[íi]\b|\bmaine\s*coon\b|\bragdoll\b|\bsphing?x\b|\besfinge\b|\babisini[oa]\b|\bangora\b|\bbosque\s*noruega\b|\bbritish\s*short\b|\bscottish\s*fold\b|\bburmés?\b|\bsomali\b|\bexotic\s*short\b/i;
 
 function dogTags(dog) {
-  // Detect species — check explicit field first, then text heuristics
-  const textPool = [dog._rawEspecie, dog.breed, dog.name, dog.description].filter(Boolean).join(' ');
-  const especie  = detectEspecieText(textPool) || 'perro';
+  // Species: only trust the explicit API field (_rawEspecie) or a cat breed name.
+  // NEVER check description — dogs are routinely described as "no tested with cats".
+  let especie = 'perro';
+  if (dog._rawEspecie && /\bgat[oa]\b|felin|^cat$/i.test(dog._rawEspecie)) especie = 'gato';
+  else if (dog.breed && CAT_BREED_RE.test(dog.breed)) especie = 'gato';
   const t = { especie, sexo:null, etapa:null, tamaño:null, energia:null };
   if (dog.gender) {
     const g = dog.gender.toLowerCase();
