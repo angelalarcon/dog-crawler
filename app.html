@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🐾 Adoptar — Madrid</title>
+  <title>🐾 Buscar Mascota — Madrid</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @keyframes fade-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -22,9 +22,6 @@
     .tf-num{color:#f59e0b;font-size:.8rem;font-weight:700;letter-spacing:.06em;margin-bottom:.6rem}
     .tf-title{font-size:clamp(1.6rem,4vw,2.1rem);font-weight:800;color:#1c1917;line-height:1.2;margin-bottom:.5rem}
     .tf-sub{font-size:.9rem;color:#78716c;margin-bottom:1.5rem;line-height:1.5}
-    .tf-input{width:100%;font-size:1.4rem;border:none;border-bottom:2.5px solid #e7e5e4;padding:.5rem 0;outline:none;background:transparent;color:#1c1917;margin-bottom:1.75rem;transition:border-color .2s}
-    .tf-input:focus{border-bottom-color:#f59e0b}
-    .tf-input::placeholder{color:#d4c8c2}
     .tf-choices{display:flex;flex-direction:column;gap:.6rem;width:100%;margin-bottom:1.75rem}
     .tf-choice{display:flex;align-items:center;gap:.8rem;border:1.5px solid #e7e5e4;border-radius:.875rem;padding:.85rem 1rem;cursor:pointer;transition:all .15s;font-size:.95rem;font-weight:500;color:#44403c;user-select:none}
     .tf-choice:hover{border-color:#fbbf24;background:#fffbeb}
@@ -39,68 +36,24 @@
     .tf-ok:active{transform:scale(.96)}
     .tf-hint{font-size:.78rem;color:#a8a29e}
     kbd{background:#f5f5f4;border:1px solid #d6d3d1;border-radius:.25rem;padding:.1rem .35rem;font-size:.73rem;font-family:inherit}
-
-    .label{display:block;font-size:.75rem;font-weight:600;color:#4b5563;margin-bottom:.25rem}
-    .inp{width:100%;border:1px solid #e7e5e4;border-radius:.75rem;padding:.625rem .75rem;font-size:.875rem;outline:none;background:white;transition:box-shadow .15s}
-    .inp:focus{box-shadow:0 0 0 2px #fcd34d}
   </style>
 </head>
 <body class="bg-stone-50 min-h-screen">
 
-<!-- ── AUTH VIEW ─────────────────────────────────────────────────────────── -->
-<div id="authView">
-  <header class="bg-gradient-to-br from-amber-500 to-amber-600 py-14 px-4 text-center">
-    <div class="text-5xl mb-3 select-none">🐾</div>
-    <h1 class="text-3xl font-bold text-white leading-tight">Encuentra tu Compañero Ideal</h1>
-    <p class="text-amber-100 mt-2 text-sm">Regístrate y te conectamos con perros de Madrid que encajan en tu vida</p>
-  </header>
-
-  <div class="max-w-xl mx-auto px-4 py-8">
-    <div class="flex rounded-2xl overflow-hidden border border-stone-200 bg-white shadow-sm mb-6">
-      <button id="tabLogin" onclick="switchTab('login')"
-        class="flex-1 py-3 text-sm font-semibold transition-colors bg-amber-500 text-white">Iniciar sesión</button>
-      <button id="tabRegister" onclick="switchTab('register')"
-        class="flex-1 py-3 text-sm font-semibold transition-colors text-gray-500 hover:text-gray-700">Registrarse</button>
-    </div>
-
-    <!-- Login -->
-    <div id="loginPane">
-      <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 space-y-4">
-        <div><label class="label">Email</label>
-          <input id="loginEmail" type="email" class="inp" placeholder="tu@email.com" /></div>
-        <div><label class="label">Contraseña</label>
-          <input id="loginPassword" type="password" class="inp" placeholder="••••••••"
-            onkeydown="if(event.key==='Enter')doLogin()" /></div>
-        <p id="loginError" class="hidden text-xs text-red-500 font-medium"></p>
-        <button onclick="doLogin()"
-          class="w-full bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-semibold py-3 rounded-xl transition-all text-sm">Entrar →</button>
-      </div>
-      <p class="text-center text-xs text-gray-400 mt-4">¿No tienes cuenta?
-        <button onclick="switchTab('register')" class="text-amber-600 font-semibold underline">Regístrate gratis</button></p>
-    </div>
-
-    <!-- Register CTA -->
-    <div id="registerPane" class="hidden">
-      <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-8 text-center space-y-5">
-        <div class="text-5xl">🐾</div>
-        <h3 class="text-xl font-bold text-gray-800">Encuentra tu match perfecto</h3>
-        <p class="text-sm text-gray-500 leading-relaxed">
-          Responde unas preguntas rápidas y te mostraremos los perros de Madrid que mejor encajan con tu vida.
-        </p>
-        <div class="flex flex-wrap justify-center gap-2 text-xs text-gray-400">
-          <span class="bg-stone-100 rounded-full px-3 py-1">⏱ Solo 3 minutos</span>
-          <span class="bg-stone-100 rounded-full px-3 py-1">🔒 Solo en tu navegador</span>
-          <span class="bg-stone-100 rounded-full px-3 py-1">🐕 10 protectoras de Madrid</span>
-        </div>
-        <button onclick="openTypeform()"
-          class="w-full bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold py-4 rounded-2xl transition-all text-base shadow-md shadow-amber-200">
-          Empezar →
-        </button>
-      </div>
-      <p class="text-center text-xs text-gray-400 mt-4">¿Ya tienes cuenta?
-        <button onclick="switchTab('login')" class="text-amber-600 font-semibold underline">Inicia sesión</button></p>
-    </div>
+<!-- ── LANDING VIEW ───────────────────────────────────────────────────────── -->
+<div id="landingView" class="min-h-screen flex flex-col items-center justify-center px-4 text-center bg-gradient-to-br from-amber-50 via-stone-50 to-white">
+  <div class="text-7xl mb-6 select-none">🐾</div>
+  <h1 class="text-4xl font-extrabold text-gray-900 leading-tight mb-3">Encuentra tu compañero ideal</h1>
+  <p class="text-gray-500 text-lg mb-8 max-w-md leading-relaxed">Responde 7 preguntas rápidas y te mostramos los animales de Madrid que mejor encajan con tu vida.</p>
+  <div class="flex flex-wrap justify-center gap-2 text-xs text-gray-400 mb-10">
+    <span class="bg-white border border-stone-200 rounded-full px-3 py-1.5">⏱ Solo 1 minuto</span>
+    <span class="bg-white border border-stone-200 rounded-full px-3 py-1.5">🐕 10 protectoras de Madrid</span>
+    <span class="bg-white border border-stone-200 rounded-full px-3 py-1.5">🔒 Sin registro necesario</span>
   </div>
+  <button onclick="openTypeform()"
+    class="bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold py-4 px-10 rounded-2xl transition-all text-lg shadow-md shadow-amber-200">
+    Buscar mascota →
+  </button>
 </div>
 
 <!-- ── TYPEFORM OVERLAY ───────────────────────────────────────────────────── -->
@@ -116,73 +69,16 @@
     <button onclick="tfBack()" id="tfBackBtn"
       class="text-sm text-gray-400 hover:text-gray-700 transition-colors disabled:opacity-25 disabled:cursor-default flex items-center gap-1"
       disabled>↑ Atrás</button>
-    <span class="text-xs font-bold text-amber-500 tracking-wide">🐾 Adoptar Madrid</span>
+    <span class="text-xs font-bold text-amber-500 tracking-wide">🐾 Buscar Mascota</span>
     <button onclick="closeTf()" class="text-gray-300 hover:text-gray-600 text-xl leading-none px-1 transition-colors">✕</button>
   </div>
 
   <!-- Question area -->
   <div id="tfContainer" class="flex-1 flex items-center justify-center px-6 py-10 overflow-y-auto">
 
-    <!-- 1 · Nombre -->
-    <div class="tf-step" id="tf-nombre">
-      <div class="tf-num">1 →</div>
-      <h2 class="tf-title">¿Cómo te llamas?</h2>
-      <input id="reg_nombre" type="text" autocomplete="name" class="tf-input" placeholder="Tu nombre completo"
-        onkeydown="if(event.key==='Enter'){event.preventDefault();tfNext()}" />
-      <div class="tf-actions">
-        <button class="tf-ok" onclick="tfNext()">OK ✓</button>
-        <span class="tf-hint">o pulsa <kbd>Enter ↵</kbd></span>
-      </div>
-    </div>
-
-    <!-- 2 · Email -->
-    <div class="tf-step" id="tf-email">
-      <div class="tf-num">2 →</div>
-      <h2 class="tf-title">¿Cuál es tu email?</h2>
-      <input id="reg_email" type="email" autocomplete="email" class="tf-input" placeholder="tu@email.com"
-        onkeydown="if(event.key==='Enter'){event.preventDefault();tfNext()}" />
-      <div class="tf-actions">
-        <button class="tf-ok" onclick="tfNext()">OK ✓</button>
-        <span class="tf-hint">o pulsa <kbd>Enter ↵</kbd></span>
-      </div>
-    </div>
-
-    <!-- 3 · Contraseña -->
-    <div class="tf-step" id="tf-password">
-      <div class="tf-num">3 →</div>
-      <h2 class="tf-title">Crea tu contraseña</h2>
-      <p class="tf-sub">Solo se guarda en este navegador. Mínimo 6 caracteres.</p>
-      <input id="reg_password" type="password" autocomplete="new-password" class="tf-input" placeholder="••••••••"
-        onkeydown="if(event.key==='Enter'){event.preventDefault();tfNext()}" />
-      <div class="tf-actions">
-        <button class="tf-ok" onclick="tfNext()">OK ✓</button>
-        <span class="tf-hint">o pulsa <kbd>Enter ↵</kbd></span>
-      </div>
-    </div>
-
-    <!-- 4 · Tipo solicitud -->
-    <div class="tf-step" id="tf-tipo">
-      <div class="tf-num">4 →</div>
-      <h2 class="tf-title">¿Qué proceso te interesa?</h2>
-      <div class="tf-choices">
-        <label class="tf-choice" onclick="tfRadioNext('tipoSolicitud')">
-          <input type="radio" name="tipoSolicitud" value="adopcion" />
-          <span class="tf-key">A</span><span class="tf-ico">🏠</span><span>Adopción permanente</span>
-        </label>
-        <label class="tf-choice" onclick="tfRadioNext('tipoSolicitud')">
-          <input type="radio" name="tipoSolicitud" value="acogida" />
-          <span class="tf-key">B</span><span class="tf-ico">⏳</span><span>Acogida temporal</span>
-        </label>
-        <label class="tf-choice" onclick="tfRadioNext('tipoSolicitud')">
-          <input type="radio" name="tipoSolicitud" value="indiferente" />
-          <span class="tf-key">C</span><span class="tf-ico">💛</span><span>Indiferente</span>
-        </label>
-      </div>
-    </div>
-
-    <!-- 5 · Especie -->
+    <!-- 1 · Especie -->
     <div class="tf-step" id="tf-especie">
-      <div class="tf-num">5 →</div>
+      <div class="tf-num">1 →</div>
       <h2 class="tf-title">¿Qué animal buscas?</h2>
       <div class="tf-choices">
         <label class="tf-choice" onclick="tfRadioNext('especie')">
@@ -200,9 +96,30 @@
       </div>
     </div>
 
-    <!-- 6 · Edad (multi) -->
+    <!-- 2 · Tamaño (multi) -->
+    <div class="tf-step" id="tf-tamaño">
+      <div class="tf-num">2 →</div>
+      <h2 class="tf-title">¿Qué tamaño prefieres?</h2>
+      <p class="tf-sub">Puedes elegir varias opciones</p>
+      <div class="tf-choices">
+        <label class="tf-choice"><input type="checkbox" name="tamañoPref" value="pequeño" />
+          <span class="tf-key">A</span><span class="tf-ico">🐩</span><span>Pequeño (menos de 10 kg)</span></label>
+        <label class="tf-choice"><input type="checkbox" name="tamañoPref" value="mediano" />
+          <span class="tf-key">B</span><span class="tf-ico">🦮</span><span>Mediano (10–25 kg)</span></label>
+        <label class="tf-choice"><input type="checkbox" name="tamañoPref" value="grande" />
+          <span class="tf-key">C</span><span class="tf-ico">🐕‍🦺</span><span>Grande (más de 25 kg)</span></label>
+        <label class="tf-choice"><input type="checkbox" name="tamañoPref" value="indiferente" />
+          <span class="tf-key">D</span><span class="tf-ico">💛</span><span>Indiferente</span></label>
+      </div>
+      <div class="tf-actions">
+        <button class="tf-ok" onclick="tfNext()">OK ✓</button>
+        <span class="tf-hint">o pulsa <kbd>Enter ↵</kbd></span>
+      </div>
+    </div>
+
+    <!-- 3 · Edad (multi) -->
     <div class="tf-step" id="tf-edad">
-      <div class="tf-num">6 →</div>
+      <div class="tf-num">3 →</div>
       <h2 class="tf-title">¿Qué edad prefieres?</h2>
       <p class="tf-sub">Puedes elegir varias opciones</p>
       <div class="tf-choices">
@@ -223,30 +140,9 @@
       </div>
     </div>
 
-    <!-- 7 · Tamaño (multi) -->
-    <div class="tf-step" id="tf-tamaño">
-      <div class="tf-num">7 →</div>
-      <h2 class="tf-title">¿Qué tamaño prefieres?</h2>
-      <p class="tf-sub">Puedes elegir varias opciones</p>
-      <div class="tf-choices">
-        <label class="tf-choice"><input type="checkbox" name="tamañoPref" value="pequeño" />
-          <span class="tf-key">A</span><span class="tf-ico">🐩</span><span>Pequeño (menos de 10 kg)</span></label>
-        <label class="tf-choice"><input type="checkbox" name="tamañoPref" value="mediano" />
-          <span class="tf-key">B</span><span class="tf-ico">🦮</span><span>Mediano (10–25 kg)</span></label>
-        <label class="tf-choice"><input type="checkbox" name="tamañoPref" value="grande" />
-          <span class="tf-key">C</span><span class="tf-ico">🐕‍🦺</span><span>Grande (más de 25 kg)</span></label>
-        <label class="tf-choice"><input type="checkbox" name="tamañoPref" value="indiferente" />
-          <span class="tf-key">D</span><span class="tf-ico">💛</span><span>Indiferente</span></label>
-      </div>
-      <div class="tf-actions">
-        <button class="tf-ok" onclick="tfNext()">OK ✓</button>
-        <span class="tf-hint">o pulsa <kbd>Enter ↵</kbd></span>
-      </div>
-    </div>
-
-    <!-- 8 · Sexo -->
+    <!-- 4 · Sexo -->
     <div class="tf-step" id="tf-sexo">
-      <div class="tf-num">8 →</div>
+      <div class="tf-num">4 →</div>
       <h2 class="tf-title">¿Prefieres macho o hembra?</h2>
       <div class="tf-choices">
         <label class="tf-choice" onclick="tfRadioNext('sexoPref')">
@@ -264,9 +160,9 @@
       </div>
     </div>
 
-    <!-- 9 · Energía -->
+    <!-- 5 · Energía -->
     <div class="tf-step" id="tf-energia">
-      <div class="tf-num">9 →</div>
+      <div class="tf-num">5 →</div>
       <h2 class="tf-title">¿Qué nivel de energía buscas?</h2>
       <div class="tf-choices">
         <label class="tf-choice" onclick="tfRadioNext('energiaPref')">
@@ -288,9 +184,9 @@
       </div>
     </div>
 
-    <!-- 10 · Vivienda -->
+    <!-- 6 · Vivienda -->
     <div class="tf-step" id="tf-vivienda">
-      <div class="tf-num">10 →</div>
+      <div class="tf-num">6 →</div>
       <h2 class="tf-title">¿Dónde vives?</h2>
       <div class="tf-choices">
         <label class="tf-choice" onclick="tfRadioNext('tipoVivienda')">
@@ -312,9 +208,9 @@
       </div>
     </div>
 
-    <!-- 11 · Exterior -->
+    <!-- 7 · Exterior -->
     <div class="tf-step" id="tf-exterior">
-      <div class="tf-num">11 →</div>
+      <div class="tf-num">7 →</div>
       <h2 class="tf-title">¿Tienes zona exterior?</h2>
       <div class="tf-choices">
         <label class="tf-choice" onclick="tfRadioNext('exterior')">
@@ -336,79 +232,6 @@
       </div>
     </div>
 
-    <!-- 12 · Horas solo -->
-    <div class="tf-step" id="tf-horas">
-      <div class="tf-num">12 →</div>
-      <h2 class="tf-title">¿Cuántas horas estará solo cada día?</h2>
-      <div class="tf-choices">
-        <label class="tf-choice" onclick="tfRadioNext('horasSolo')">
-          <input type="radio" name="horasSolo" value="<4" />
-          <span class="tf-key">A</span><span class="tf-ico">😊</span><span>Menos de 4 horas</span>
-        </label>
-        <label class="tf-choice" onclick="tfRadioNext('horasSolo')">
-          <input type="radio" name="horasSolo" value="4-8" />
-          <span class="tf-key">B</span><span class="tf-ico">⏰</span><span>Entre 4 y 8 horas</span>
-        </label>
-        <label class="tf-choice" onclick="tfRadioNext('horasSolo')">
-          <input type="radio" name="horasSolo" value=">8" />
-          <span class="tf-key">C</span><span class="tf-ico">😔</span><span>Más de 8 horas</span>
-        </label>
-      </div>
-    </div>
-
-    <!-- 13 · Menores -->
-    <div class="tf-step" id="tf-menores">
-      <div class="tf-num">13 →</div>
-      <h2 class="tf-title">¿Hay niños en casa?</h2>
-      <div class="tf-choices">
-        <label class="tf-choice" onclick="tfRadioNext('menores')">
-          <input type="radio" name="menores" value="si" />
-          <span class="tf-key">A</span><span class="tf-ico">👧</span><span>Sí, hay menores</span>
-        </label>
-        <label class="tf-choice" onclick="tfRadioNext('menores')">
-          <input type="radio" name="menores" value="no" />
-          <span class="tf-key">B</span><span class="tf-ico">🏠</span><span>No, solo adultos</span>
-        </label>
-      </div>
-    </div>
-
-    <!-- 14 · Experiencia -->
-    <div class="tf-step" id="tf-experiencia">
-      <div class="tf-num">14 →</div>
-      <h2 class="tf-title">¿Has tenido mascotas antes?</h2>
-      <div class="tf-choices">
-        <label class="tf-choice" onclick="tfRadioNext('experiencia')">
-          <input type="radio" name="experiencia" value="si" />
-          <span class="tf-key">A</span><span class="tf-ico">✅</span><span>Sí, tengo experiencia</span>
-        </label>
-        <label class="tf-choice" onclick="tfRadioNext('experiencia')">
-          <input type="radio" name="experiencia" value="no" />
-          <span class="tf-key">B</span><span class="tf-ico">🐾</span><span>No, sería la primera vez</span>
-        </label>
-      </div>
-    </div>
-
-    <!-- 15 · Foster (conditional) -->
-    <div class="tf-step" id="tf-foster">
-      <div class="tf-num">15 →</div>
-      <h2 class="tf-title">¿Cuánto tiempo puedes acoger?</h2>
-      <p class="tf-sub">Solo para solicitudes de acogida temporal</p>
-      <div class="tf-choices">
-        <label class="tf-choice" onclick="tfRadioNext('disponibilidadFoster')">
-          <input type="radio" name="disponibilidadFoster" value="semanas" />
-          <span class="tf-key">A</span><span class="tf-ico">📅</span><span>Unas semanas</span>
-        </label>
-        <label class="tf-choice" onclick="tfRadioNext('disponibilidadFoster')">
-          <input type="radio" name="disponibilidadFoster" value="meses" />
-          <span class="tf-key">B</span><span class="tf-ico">📆</span><span>Varios meses</span>
-        </label>
-        <label class="tf-choice" onclick="tfRadioNext('disponibilidadFoster')">
-          <input type="radio" name="disponibilidadFoster" value="indefinido" />
-          <span class="tf-key">C</span><span class="tf-ico">♾️</span><span>Hasta que sea adoptado</span>
-        </label>
-      </div>
-    </div>
-
   </div><!-- /tfContainer -->
 
   <!-- Error toast -->
@@ -418,7 +241,7 @@
 
   <!-- Bottom bar -->
   <div class="flex-shrink-0 px-5 py-4 border-t border-stone-100 bg-white flex items-center justify-between">
-    <span class="text-xs text-gray-300 hidden sm:block">🔒 Datos solo en tu navegador</span>
+    <span class="text-xs text-gray-300 hidden sm:block">🔒 Sin registro necesario</span>
     <div class="flex items-center gap-2 ml-auto">
       <button onclick="tfBack()"
         class="w-9 h-9 flex items-center justify-center rounded-lg border border-stone-200 text-gray-400 hover:text-gray-700 hover:border-stone-300 transition-colors text-base">↑</button>
@@ -437,8 +260,8 @@
       <div class="flex items-center gap-3 min-w-0">
         <span class="text-2xl select-none">🐾</span>
         <div class="min-w-0">
-          <h1 class="font-bold text-gray-900 truncate">Hola, <span id="welcomeName">...</span> 👋</h1>
-          <p class="text-xs text-gray-400">Matches de <span id="shelterCount">10</span> protectoras de Madrid</p>
+          <h1 class="font-bold text-gray-900">Buscar Mascota</h1>
+          <p class="text-xs text-gray-400">Resultados de <span id="shelterCount">10</span> protectoras de Madrid</p>
         </div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
@@ -446,17 +269,17 @@
           class="bg-amber-500 hover:bg-amber-600 active:scale-95 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all flex items-center gap-1">
           <span id="searchBtnIcon">🔍</span> <span id="searchBtnText">Buscar</span>
         </button>
-        <button onclick="doLogout()"
-          class="text-gray-400 hover:text-gray-600 text-xs px-3 py-2 rounded-xl hover:bg-stone-50 transition-colors">Salir</button>
+        <button onclick="resetSearch()"
+          class="text-gray-400 hover:text-gray-600 text-xs px-3 py-2 rounded-xl hover:bg-stone-50 transition-colors">Nueva búsqueda</button>
       </div>
     </div>
   </header>
 
   <div class="bg-amber-50 border-b border-amber-100 px-4 py-2.5">
     <div class="max-w-7xl mx-auto flex flex-wrap gap-1.5 items-center">
-      <span class="text-xs text-amber-600 font-semibold mr-1">Tu perfil:</span>
+      <span class="text-xs text-amber-600 font-semibold mr-1">Tu búsqueda:</span>
       <div id="tagsSummary" class="flex flex-wrap gap-1.5"></div>
-      <button onclick="doLogout()" class="text-xs text-amber-500 underline ml-auto">Editar perfil</button>
+      <button onclick="resetSearch()" class="text-xs text-amber-500 underline ml-auto">Editar</button>
     </div>
   </div>
 
@@ -519,91 +342,28 @@ const SHELTER_URLS = [
   { url: 'https://www.anaaweb.org/en/perros-en-adopcion',              name: 'ANAA' },
 ];
 
-// ── Auth ───────────────────────────────────────────────────────────────────
-async function hashPw(pw) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
-  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
-}
-const loadUser = () => { try { const u=localStorage.getItem('adopta_user'); return u?JSON.parse(u):null; } catch{return null;} };
-const saveUser = u => localStorage.setItem('adopta_user', JSON.stringify(u));
-
-async function doLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pw    = document.getElementById('loginPassword').value;
-  if (!email || !pw) { showLoginErr('Rellena todos los campos'); return; }
-  const hash = await hashPw(pw);
-  const stored = loadUser();
-  if (!stored || stored.email !== email || stored.passwordHash !== hash) {
-    showLoginErr('Email o contraseña incorrectos'); return;
-  }
-  currentUser = stored;
-  showDashboard();
-}
-
-async function doRegister() {
-  const d = gatherForm();
-  const passwordHash = await hashPw(d.password);
-  delete d.password;
-  const user = { ...d, passwordHash, createdAt: new Date().toISOString() };
-  saveUser(user);
-  currentUser = user;
-  closeTf();
-  showDashboard();
-}
-
-function doLogout() {
-  currentUser = null;
-  document.getElementById('dashboardView').classList.add('hidden');
-  document.getElementById('authView').classList.remove('hidden');
-  document.getElementById('grid').innerHTML = '';
-  switchTab('login');
-}
-
-function showLoginErr(msg) {
-  const el = document.getElementById('loginError');
-  el.textContent = msg;
-  el.classList.remove('hidden');
-}
-
-// ── Tab / UI ───────────────────────────────────────────────────────────────
-function switchTab(tab) {
-  const isLogin = tab === 'login';
-  document.getElementById('loginPane').classList.toggle('hidden', !isLogin);
-  document.getElementById('registerPane').classList.toggle('hidden', isLogin);
-  document.getElementById('tabLogin').className    = `flex-1 py-3 text-sm font-semibold transition-colors ${isLogin ? 'bg-amber-500 text-white' : 'text-gray-500 hover:text-gray-700'}`;
-  document.getElementById('tabRegister').className = `flex-1 py-3 text-sm font-semibold transition-colors ${!isLogin ? 'bg-amber-500 text-white' : 'text-gray-500 hover:text-gray-700'}`;
-  document.getElementById('loginError').classList.add('hidden');
-}
-
 // ── Typeform ───────────────────────────────────────────────────────────────
-const TF_BASE = ['tf-nombre','tf-email','tf-password','tf-tipo','tf-especie',
-                 'tf-edad','tf-tamaño','tf-sexo','tf-energia',
-                 'tf-vivienda','tf-exterior','tf-horas','tf-menores','tf-experiencia'];
+const TF_FLOW = ['tf-especie','tf-tamaño','tf-edad','tf-sexo','tf-energia','tf-vivienda','tf-exterior'];
 
 let tfCurrent = 0;
 let tfAutoTimer    = null;
 let tfErrTimer     = null;
 let isTransitioning = false;
 
-function getTfFlow() {
-  const tipo = document.querySelector('input[name="tipoSolicitud"]:checked')?.value;
-  return (tipo === 'acogida' || tipo === 'indiferente') ? [...TF_BASE, 'tf-foster'] : [...TF_BASE];
-}
-
 function openTypeform() {
   tfCurrent = 0;
   isTransitioning = false;
+  document.querySelectorAll('.tf-step input').forEach(inp => { inp.checked = false; });
   document.querySelectorAll('.tf-step').forEach(s => {
     s.style.display = 'none';
     s.classList.remove('active','leaving');
   });
-  const first = document.getElementById('tf-nombre');
+  const first = document.getElementById('tf-especie');
   first.style.display = 'flex';
   first.classList.add('active');
   document.getElementById('typeformView').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
   updateTfUI();
-  setTimeout(() => document.getElementById('reg_nombre').focus(), 150);
 }
 
 function closeTf() {
@@ -613,10 +373,8 @@ function closeTf() {
 
 function tfNext() {
   if (isTransitioning) return;
-  const flow   = getTfFlow();
-  const stepId = flow[tfCurrent];
-  if (!validateTfStep(stepId)) return;
-  if (tfCurrent >= flow.length - 1) { doRegister(); return; }
+  const stepId = TF_FLOW[tfCurrent];
+  if (tfCurrent >= TF_FLOW.length - 1) { finishQuestionnaire(); return; }
 
   isTransitioning = true;
   const cur = document.getElementById(stepId);
@@ -625,30 +383,25 @@ function tfNext() {
     cur.style.display = 'none';
     cur.classList.remove('active','leaving');
     tfCurrent++;
-    const next = document.getElementById(flow[tfCurrent]);
+    const next = document.getElementById(TF_FLOW[tfCurrent]);
     next.style.display = 'flex';
     next.classList.add('active');
     updateTfUI();
     isTransitioning = false;
-    const inp = next.querySelector('input[type="text"],input[type="email"],input[type="password"]');
-    if (inp) setTimeout(() => inp.focus(), 150);
   }, 230);
 }
 
 function tfBack() {
   if (isTransitioning || tfCurrent === 0) return;
   clearTimeout(tfAutoTimer);
-  const flow = getTfFlow();
-  const cur = document.getElementById(flow[tfCurrent]);
+  const cur = document.getElementById(TF_FLOW[tfCurrent]);
   cur.style.display = 'none';
   cur.classList.remove('active','leaving');
   tfCurrent--;
-  const prev = document.getElementById(flow[tfCurrent]);
+  const prev = document.getElementById(TF_FLOW[tfCurrent]);
   prev.style.display = 'flex';
   prev.classList.add('active');
   updateTfUI();
-  const inp = prev.querySelector('input[type="text"],input[type="email"],input[type="password"]');
-  if (inp) setTimeout(() => inp.focus(), 150);
 }
 
 function tfRadioNext(name) {
@@ -660,47 +413,23 @@ function tfRadioNext(name) {
 }
 
 function updateTfUI() {
-  const flow  = getTfFlow();
-  const total = flow.length;
+  const total = TF_FLOW.length;
   const cur   = tfCurrent + 1;
   document.getElementById('tfProgress').style.width = `${Math.round((cur / total) * 100)}%`;
   document.getElementById('tfBackBtn').disabled = tfCurrent === 0;
-  flow.forEach((id, i) => {
+  TF_FLOW.forEach((id, i) => {
     const el = document.querySelector(`#${id} .tf-num`);
     if (el) el.textContent = `${i + 1} →`;
   });
 }
 
-function validateTfStep(stepId) {
-  const show = (msg) => {
-    const el = document.getElementById('tfError');
-    el.textContent = msg;
-    el.classList.remove('hidden');
-    clearTimeout(tfErrTimer);
-    tfErrTimer = setTimeout(() => el.classList.add('hidden'), 3000);
-    return false;
-  };
-  if (stepId === 'tf-nombre'  && !document.getElementById('reg_nombre').value.trim())
-    return show('Escribe tu nombre para continuar');
-  if (stepId === 'tf-email') {
-    const v = document.getElementById('reg_email').value.trim();
-    if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return show('Introduce un email válido');
-  }
-  if (stepId === 'tf-password' && document.getElementById('reg_password').value.length < 6)
-    return show('La contraseña debe tener al menos 6 caracteres');
-  return true;
-}
-
 // Keyboard shortcuts inside typeform
 document.addEventListener('keydown', e => {
   if (document.getElementById('typeformView').classList.contains('hidden')) return;
-  const flow   = getTfFlow();
-  const stepId = flow[tfCurrent];
+  const stepId = TF_FLOW[tfCurrent];
   const step   = document.getElementById(stepId);
-  const active = document.activeElement;
-  const isText = active?.tagName === 'INPUT' && ['text','email','password'].includes(active.type);
 
-  if (!isText && /^[a-e]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+  if (/^[a-e]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
     const choices = [...step.querySelectorAll('.tf-choice input')];
     const idx = e.key.charCodeAt(0) - 97;
     if (choices[idx]) {
@@ -714,38 +443,27 @@ document.addEventListener('keydown', e => {
     }
     return;
   }
-  if (e.key === 'Enter' && !isText) { e.preventDefault(); tfNext(); }
+  if (e.key === 'Enter') { e.preventDefault(); tfNext(); }
 });
 
-// ── Form data ──────────────────────────────────────────────────────────────
+// ── Form & prefs ──────────────────────────────────────────────────────────
 function gatherForm() {
-  const v  = id => document.getElementById(id)?.value?.trim() || '';
-  const r  = n  => document.querySelector(`input[name="${n}"]:checked`)?.value || '';
-  const cb = n  => [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(e => e.value);
+  const r  = n => document.querySelector(`input[name="${n}"]:checked`)?.value || '';
+  const cb = n => [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(e => e.value);
   return {
-    nombre:   v('reg_nombre'),
-    email:    v('reg_email'),
-    password: v('reg_password'),
-    tipoSolicitud:       r('tipoSolicitud')  || 'indiferente',
-    especie:             r('especie')        || 'perro',
-    edadPref:            cb('edadPref'),
-    tamañoPref:          cb('tamañoPref'),
-    sexoPref:            r('sexoPref')       || 'indiferente',
-    energiaPref:         r('energiaPref')    || 'indiferente',
-    tipoVivienda:        r('tipoVivienda')   || 'piso',
-    exterior:            r('exterior')       || 'ninguno',
-    horasSolo:           r('horasSolo')      || '<4',
-    menores:             r('menores')        || 'no',
-    experiencia:         r('experiencia')    || 'no',
-    disponibilidadFoster: r('disponibilidadFoster'),
+    especie:      r('especie')      || 'indiferente',
+    tamañoPref:   cb('tamañoPref'),
+    edadPref:     cb('edadPref'),
+    sexoPref:     r('sexoPref')     || 'indiferente',
+    energiaPref:  r('energiaPref')  || 'indiferente',
+    tipoVivienda: r('tipoVivienda') || 'piso',
+    exterior:     r('exterior')     || 'ninguno',
   };
 }
 
-// ── Tag computation ────────────────────────────────────────────────────────
 function userPrefs(u) {
   return {
-    tipoSolicitud: u.tipoSolicitud || 'indiferente',
-    especie:       u.especie || 'perro',
+    especie:       u.especie || 'indiferente',
     sexo:          u.sexoPref || 'indiferente',
     edades:        u.edadPref?.length ? u.edadPref : ['indiferente'],
     tamaños:       u.tamañoPref?.length ? u.tamañoPref : ['indiferente'],
@@ -753,12 +471,27 @@ function userPrefs(u) {
     tipoVivienda:  u.tipoVivienda || 'piso',
     tieneJardin:   u.exterior === 'jardin',
     tieneExterior: ['terraza','jardin'].includes(u.exterior),
-    horasSolo:     u.horasSolo || '<4',
-    menores:       u.menores === 'si',
-    experiencia:   u.experiencia === 'si',
   };
 }
 
+function finishQuestionnaire() {
+  const prefs = gatherForm();
+  sessionStorage.setItem('buscar_prefs', JSON.stringify(prefs));
+  currentPrefs = prefs;
+  closeTf();
+  showDashboard();
+}
+
+function resetSearch() {
+  if (abortCtrl) abortCtrl.abort();
+  currentPrefs = null;
+  sessionStorage.removeItem('buscar_prefs');
+  document.getElementById('dashboardView').classList.add('hidden');
+  document.getElementById('landingView').classList.remove('hidden');
+  document.getElementById('grid').innerHTML = '';
+}
+
+// ── Tag computation ────────────────────────────────────────────────────────
 function dogTags(dog) {
   const t = { especie:'perro', sexo:null, etapa:null, tamaño:null, energia:null };
   if (dog.gender) {
@@ -1013,8 +746,10 @@ function mapMascomadDog(r) {
   const link = linkMatch?.[1]||null;
   let ageText = r.edadTexto||null;
   if (!ageText && r.fechaNacimiento) {
-    const y = Math.floor((Date.now()-new Date(r.fechaNacimiento))/(365.25*864e5));
-    const mo= Math.floor((Date.now()-new Date(r.fechaNacimiento))/(30.44*864e5));
+    const born = new Date(r.fechaNacimiento);
+    const now  = new Date();
+    const y = Math.floor((now - born)/(365.25*864e5));
+    const mo= Math.floor((now - born)/(30.44*864e5));
     ageText = y>=1 ? `${y} año${y>1?'s':''}` : `${mo} mes${mo!==1?'es':''}`;
   }
   return { source:'mascomad', name:r.nombre||null, breed:r.raza||null,
@@ -1038,7 +773,7 @@ async function startAutoSearch() {
   if (abortCtrl) abortCtrl.abort();
   abortCtrl = new AbortController();
   const { signal } = abortCtrl;
-  const prefs = userPrefs(currentUser);
+  const prefs = userPrefs(currentPrefs);
 
   document.getElementById('grid').innerHTML='';
   document.getElementById('totalBadge').textContent='0';
@@ -1089,7 +824,7 @@ async function startAutoSearch() {
   const needsDetail = allDogs.filter(d => d.source!=='mascomad' && d.link);
   const totalDetail = needsDetail.length;
   let detailDone = 0;
-  setProgress(62, `${allDogs.length} perros`, 'Obteniendo perfiles...', '🔗', '');
+  setProgress(62, `${allDogs.length} animales`, 'Obteniendo perfiles...', '🔗', '');
 
   await withPool(needsDetail, async(dog) => {
     if (signal.aborted) return;
@@ -1123,27 +858,25 @@ async function startAutoSearch() {
 }
 
 // ── UI helpers ─────────────────────────────────────────────────────────────
-let currentUser = null;
+let currentPrefs = null;
 
 function showDashboard() {
-  document.getElementById('authView').classList.add('hidden');
+  document.getElementById('landingView').classList.add('hidden');
   document.getElementById('dashboardView').classList.remove('hidden');
-  document.getElementById('welcomeName').textContent = currentUser.nombre.split(' ')[0];
   document.getElementById('shelterCount').textContent = SHELTER_URLS.length;
   renderTagsSummary();
   setTimeout(startAutoSearch, 400);
 }
 
 function renderTagsSummary() {
-  const prefs = userPrefs(currentUser);
+  const prefs = userPrefs(currentPrefs);
   const tags  = [];
-  const tipo  = { adopcion:'🏠 Adopción', acogida:'⏳ Acogida', indiferente:'💛 Adopción/Acogida' };
-  tags.push(tipo[prefs.tipoSolicitud]||prefs.tipoSolicitud);
-  if (prefs.especie!=='indiferente') tags.push({perro:'🐕 Perro',gato:'🐱 Gato'}[prefs.especie]||prefs.especie);
+  if (prefs.especie !== 'indiferente') tags.push({perro:'🐕 Perro',gato:'🐱 Gato'}[prefs.especie]||prefs.especie);
+  else tags.push('🐾 Perro o gato');
   if (!prefs.edades.includes('indiferente') && prefs.edades.length) tags.push('Edad: '+prefs.edades.join(', '));
   if (!prefs.tamaños.includes('indiferente') && prefs.tamaños.length) tags.push('Tamaño: '+prefs.tamaños.join(', '));
-  if (prefs.sexo!=='indiferente') tags.push({macho:'♂️ Macho',hembra:'♀️ Hembra'}[prefs.sexo]||prefs.sexo);
-  if (prefs.energia!=='indiferente') tags.push('Energía '+prefs.energia);
+  if (prefs.sexo !== 'indiferente') tags.push({macho:'♂️ Macho',hembra:'♀️ Hembra'}[prefs.sexo]||prefs.sexo);
+  if (prefs.energia !== 'indiferente') tags.push('Energía '+prefs.energia);
   if (prefs.tieneJardin) tags.push('🌳 Con jardín');
   document.getElementById('tagsSummary').innerHTML = tags.map(t=>
     `<span class="text-xs bg-white border border-amber-200 text-amber-700 px-2 py-0.5 rounded-full font-medium">${esc(t)}</span>`
@@ -1209,12 +942,6 @@ function appendMatchCard(dog, score) {
 function esc(s) {
   return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
-// ── Init ───────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  const stored = loadUser();
-  if (stored) { currentUser = stored; showDashboard(); }
-});
 </script>
 </body>
 </html>
